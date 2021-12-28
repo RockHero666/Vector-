@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?><DEFECTS><DEFECT>
+    <SFA>
+      <FILEPATH>Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\</FILEPATH>
+      <FILENAME>my_vector.h</FILENAME>
+      <LINE>436</LINE>
+      <COLUMN>47</COLUMN>
+    </SFA>
+    <DEFECTCODE>26439</DEFECTCODE>
+    <DESCRIPTION>Эта функция не может "throw". Объявите ее как "noexcept" (f.6).</DESCRIPTION>
+    <FUNCTION>my::vector&lt;int,my::Allocator&lt;int&gt; &gt;::=</FUNCTION>
+    <DECORATED>??4?$vector@HV?$Allocator@H@my@@@my@@QEAAAEAV01@$$QEAV01@@Z</DECORATED>
+    <FUNCLINE>436</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT></DEFECTS>

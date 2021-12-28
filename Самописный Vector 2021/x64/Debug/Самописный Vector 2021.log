@@ -1,0 +1,4 @@
+﻿  Source.cpp
+Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\Source.cpp(13,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\my_vector.h(755): warning C4715: my::vector<int,my::Allocator<int> >::iterator<int>::operator*: значение возвращается не при всех путях выполнения
+  Самописный Vector 2021.vcxproj -> Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\x64\Debug\Самописный Vector 2021.exe
