@@ -1,20 +1,3 @@
 ﻿  Source.cpp
-Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\Source.cpp(13,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
-Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\my_vector.h(355,1): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\my_vector.h(353): message : во время компиляции функции-члена класс шаблон "my::vector<int,my::Allocator<T>>::iterator<T> my::vector<T,my::Allocator<T>>::end(void)"
-          with
-          [
-              T=int
-          ]
-Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\Source.cpp(70): message : выполняется компиляция ссылки на экземпляр шаблон функции "my::vector<int,my::Allocator<T>>::iterator<T> my::vector<T,my::Allocator<T>>::end(void)"
-          with
-          [
-              T=int
-          ]
-Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\Source.cpp(66): message : выполняется компиляция ссылки на экземпляр класс шаблон функции "my::vector<int,my::Allocator<T>>"
-          with
-          [
-              T=int
-          ]
-Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\my_vector.h(770): warning C4715: my::vector<int,my::Allocator<int> >::iterator<int>::operator*: значение возвращается не при всех путях выполнения
+Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\Source.cpp(8,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
   Самописный Vector 2021.vcxproj -> Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\x64\Debug\Самописный Vector 2021.exe

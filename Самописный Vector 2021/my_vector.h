@@ -79,7 +79,7 @@ namespace my
 			};																/////////////////ITERATOR END/////////////
 
 			vector();											//  конструктор без параметров выделяет память на 8 ячеек
-			vector(size_t size, const Alloc& alloc = Alloc() );  //  конструктор выделяющий size ячеек а capacity size*2 если size>8 или = 8  при size<8
+			vector(size_t size, const T& val = T());  //  конструктор выделяющий size ячеек а capacity size*2 если size>8 или = 8  при size<8
 			vector(const vector& vect);		//  конструктор копирования с полным копированием данных масивва и аллокацией нового
 			~vector(); //Деструктор
 			vector(vector&& vect)noexcept; // Конструктор перемещения
@@ -89,7 +89,6 @@ namespace my
 			iterator<T> end();   // итератор вернет ptr + count
 			iterator<T> begin()const; // итератор вернет ptr
 			iterator<T> end()const;   // итератор вернет ptr + count
-
 			
 
 
@@ -133,6 +132,7 @@ namespace my
 			T* data();
 			size_t capacity();
 			bool empty();
+			void shrink_to_fit();
 
 			T& operator [](size_t position)const;
 			vector& operator = (const vector<T, Alloc>& vect);
@@ -232,7 +232,7 @@ my::vector<T, Alloc>::vector()
 }
 
 template<class T, class Alloc>
-my::vector<T, Alloc>::vector(size_t size, const  Alloc& alloc) :_size(size), allocator(alloc)
+my::vector<T, Alloc>::vector(size_t size, const T& val) :_size(size)
 {
 	
 	
@@ -255,7 +255,7 @@ my::vector<T, Alloc>::vector(size_t size, const  Alloc& alloc) :_size(size), all
 
 	for (int i = 0; i < size; i++)
 	{
-		ptr[i] = 0;
+		ptr[i] = val;
 	}
 #ifdef debag
 	std::cout << " \n" << "Конструктор с аргументами" << " \n";
@@ -638,12 +638,30 @@ template<class T, class Alloc>
 	}
 
 	 template<class T, class Alloc>
-	 inline bool my::vector<T, Alloc>::empty()
+	  bool my::vector<T, Alloc>::empty()
 	 {
 		 return _size == 0;
 	 }
 
 
+	 template<class T,class Alloc>
+	 void my::vector<T,Alloc>::shrink_to_fit()
+	 {
+		 if (_size == _capacity)
+			 return;
+
+		 T* new_ptr = allocator.allocate(_size);
+		 _capacity = _size;
+
+		 for (int i = 0; i < _size; i++)
+		 {
+			 new_ptr[i] = std::move(ptr[i]);
+		 }
+
+		 delete[] ptr;
+
+		 ptr = new_ptr;
+	 }
 
 
    template<class T, class Alloc>
