@@ -1,8 +1,8 @@
-#pragma once
-//#define debag  // раскоментить для дебага
-#define C17 // поменять на 14 для variadic templates
-#pragma warning(disable : 4996)  // проблемма std::iterator
-
+п»ї#pragma once
+//#define debag  // СЂР°СЃРєРѕРјРµРЅС‚РёС‚СЊ РґР»СЏ РґРµР±Р°РіР°
+#define C17 // РїРѕРјРµРЅСЏС‚СЊ РЅР° 14 РґР»СЏ variadic templates
+//#pragma warning(disable : 4996)  // РїСЂРѕР±Р»РµРјРјР° std::iterator
+//
 namespace my
 {
 
@@ -12,15 +12,15 @@ namespace my
 	class Allocator;
 
 	template<class T>
-	class Allocator  // менеджер памяти
+	class Allocator  // РјРµРЅРµРґР¶РµСЂ РїР°РјСЏС‚Рё
 	{
 	public:
-		T* pointer = nullptr; // указатель на динамическую память который передается при аллоцировании
+		T* pointer = nullptr; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РґРёРЅР°РјРёС‡РµСЃРєСѓСЋ РїР°РјСЏС‚СЊ РєРѕС‚РѕСЂС‹Р№ РїРµСЂРµРґР°РµС‚СЃСЏ РїСЂРё Р°Р»Р»РѕС†РёСЂРѕРІР°РЅРёРё
 	public:
 		Allocator();
-		Allocator(const Allocator& copy_alloc); // почленное копирование
+		Allocator(const Allocator& copy_alloc); // РїРѕС‡Р»РµРЅРЅРѕРµ РєРѕРїРёСЂРѕРІР°РЅРёРµ
 
-		T* allocate(size_t size); // возвращает указатель на область памяти  равную size
+		T* allocate(size_t size); // РІРѕР·РІСЂР°С‰Р°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РѕР±Р»Р°СЃС‚СЊ РїР°РјСЏС‚Рё  СЂР°РІРЅСѓСЋ size
 		void   deallocate();
 		size_t max_size() const;
 		bool operator ==(const Allocator<T>& alloc);
@@ -36,18 +36,26 @@ namespace my
 	{
 
 	private:
-		size_t _capacity = 0; // вместимость (реальное количество доступных ячеек)
-		size_t _size = 0;     // предпологаемый пользователем размер вектора
-		T* ptr = nullptr;    // указатель на аллоцированную память
-		Alloc allocator;     // экземпляр аллокатора для управления памятью 
+		size_t _capacity = 0; // РІРјРµСЃС‚РёРјРѕСЃС‚СЊ (СЂРµР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅС‹С… СЏС‡РµРµРє)
+		size_t _size = 0;     // РїСЂРµРґРїРѕР»РѕРіР°РµРјС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј СЂР°Р·РјРµСЂ РІРµРєС‚РѕСЂР°
+		T* ptr = nullptr;    // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р°Р»Р»РѕС†РёСЂРѕРІР°РЅРЅСѓСЋ РїР°РјСЏС‚СЊ
+		Alloc allocator;     // СЌРєР·РµРјРїР»СЏСЂ Р°Р»Р»РѕРєР°С‚РѕСЂР° РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РїР°РјСЏС‚СЊСЋ 
 		
 
 
 	public:
 		
 			template<class U=T>
-			class iterator : public std::iterator<std::forward_iterator_tag,T> /////////////////ITERATOR/////////////
+			class iterator ///////////////////////////////////////// /////////////////ITERATOR/////////////
 			{
+				friend class vector;
+
+				using iterator_category = std::random_access_iterator_tag;
+				using value_type = void; 
+				using difference_type = void;
+				using pointer = void;
+				using reference = void;
+
 			private:
 				U* ptr= nullptr;
 				int position = 0;
@@ -65,27 +73,29 @@ namespace my
 				iterator<U> operator - (int x);
 				iterator<U> operator + (int x);
 				int get_position();
+			private:
+				iterator(U* ptr,int pos);
 
 			};																/////////////////ITERATOR END/////////////
 
-			vector();											//  конструктор без параметров выделяет память на 8 ячеек
-			vector(size_t size, const Alloc& alloc = Alloc() );  //  конструктор выделяющий size ячеек а capacity size*2 если size>8 или = 8  при size<8
-			vector(const vector& vect);		//  конструктор копирования с полным копированием данных масивва и аллокацией нового
-			~vector(); //Деструктор
-			vector(vector&& vect)noexcept; // Конструктор перемещения
-			vector(const std::initializer_list<T>& list); // Конструктор с параметром листа инициализации
+			vector();											//  РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Р±РµР· РїР°СЂР°РјРµС‚СЂРѕРІ РІС‹РґРµР»СЏРµС‚ РїР°РјСЏС‚СЊ РЅР° 8 СЏС‡РµРµРє
+			vector(size_t size, const Alloc& alloc = Alloc() );  //  РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РІС‹РґРµР»СЏСЋС‰РёР№ size СЏС‡РµРµРє Р° capacity size*2 РµСЃР»Рё size>8 РёР»Рё = 8  РїСЂРё size<8
+			vector(const vector& vect);		//  РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ СЃ РїРѕР»РЅС‹Рј РєРѕРїРёСЂРѕРІР°РЅРёРµРј РґР°РЅРЅС‹С… РјР°СЃРёРІРІР° Рё Р°Р»Р»РѕРєР°С†РёРµР№ РЅРѕРІРѕРіРѕ
+			~vector(); //Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
+			vector(vector&& vect)noexcept; // РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРµСЂРµРјРµС‰РµРЅРёСЏ
+			vector(const std::initializer_list<T>& list); // РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃ РїР°СЂР°РјРµС‚СЂРѕРј Р»РёСЃС‚Р° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 
-			iterator<T> begin(); // итератор вернет ptr
-			iterator<T> end();   // итератор вернет ptr + count
-			iterator<T> begin()const; // итератор вернет ptr
-			iterator<T> end()const;   // итератор вернет ptr + count
+			iterator<T> begin(); // РёС‚РµСЂР°С‚РѕСЂ РІРµСЂРЅРµС‚ ptr
+			iterator<T> end();   // РёС‚РµСЂР°С‚РѕСЂ РІРµСЂРЅРµС‚ ptr + count
+			iterator<T> begin()const; // РёС‚РµСЂР°С‚РѕСЂ РІРµСЂРЅРµС‚ ptr
+			iterator<T> end()const;   // РёС‚РµСЂР°С‚РѕСЂ РІРµСЂРЅРµС‚ ptr + count
 
 			
 
 
-			void push_back(const T& value); // обертка для emplace_back
+			void push_back(const T& value); // РѕР±РµСЂС‚РєР° РґР»СЏ emplace_back
 
-			void resize(size_t x); // с возможностью ручной и автоматической реалокации через увеличение вектора методами вектора
+			void resize(size_t x); // СЃ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊСЋ СЂСѓС‡РЅРѕР№ Рё Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕР№ СЂРµР°Р»РѕРєР°С†РёРё С‡РµСЂРµР· СѓРІРµР»РёС‡РµРЅРёРµ РІРµРєС‚РѕСЂР° РјРµС‚РѕРґР°РјРё РІРµРєС‚РѕСЂР°
 			void clear(); 
 			size_t size();
 			void assign(size_t new_size, const T& value);
@@ -131,28 +141,13 @@ namespace my
 
 
 	};
-
-	//шаблонность  с горем по яйцам
-	//итератор  полу готов  (форвард)
-	//алокатор готов
-	//осн методы  в процессе 
-	// совместимость с stl   пытаюсь
-
-
 	
 }////////////////////////////////////////////////////VECTOR END/////////////////////////////////////////
 
 
-
 using namespace my;
 
-
-
-
-
-
-
-///////////////////////////блок Аллокатора/////////////////////////////////////////
+///////////////////////////Р±Р»РѕРє РђР»Р»РѕРєР°С‚РѕСЂР°/////////////////////////////////////////
 
 
 template<class T>
@@ -226,13 +221,13 @@ template<class T>
 
 
 
-///////////////////////////блок Вектора/////////////////////////////////////////
+///////////////////////////Р±Р»РѕРє Р’РµРєС‚РѕСЂР°/////////////////////////////////////////
 
 template<class T, class Alloc>
 my::vector<T, Alloc>::vector()
 {
 #ifdef debag
-	std::cout << " \n" << "Конструктор по дефолту" << " \n";
+	std::cout << " \n" << "РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ РґРµС„РѕР»С‚Сѓ" << " \n";
 #endif
 }
 
@@ -263,7 +258,7 @@ my::vector<T, Alloc>::vector(size_t size, const  Alloc& alloc) :_size(size), all
 		ptr[i] = 0;
 	}
 #ifdef debag
-	std::cout << " \n" << "Конструктор с аргументами" << " \n";
+	std::cout << " \n" << "РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃ Р°СЂРіСѓРјРµРЅС‚Р°РјРё" << " \n";
 #endif
 }
 
@@ -279,7 +274,7 @@ template<class T, class Alloc>
 		this->ptr[i] = vect.ptr[i];
 	}
 #ifdef debag
-	std::cout << " \n" << "Конструктор копирования" << " \n";
+	std::cout << " \n" << "РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ" << " \n";
 #endif
 
 }
@@ -291,14 +286,14 @@ template<class T, class Alloc>
 	  {
 		  allocator.deallocate();
 #ifdef debag
-		  std::cout << " \n" << "Деструктор сработал " << " \n";
+		  std::cout << " \n" << "Р”РµСЃС‚СЂСѓРєС‚РѕСЂ СЃСЂР°Р±РѕС‚Р°Р» " << " \n";
 #endif
 		  return;
 	  }
 
 #ifdef debag
 
-	  std::cout << " \n" << "Деструктор запустился но не сработал " << " \n";
+	  std::cout << " \n" << "Р”РµСЃС‚СЂСѓРєС‚РѕСЂ Р·Р°РїСѓСЃС‚РёР»СЃСЏ РЅРѕ РЅРµ СЃСЂР°Р±РѕС‚Р°Р» " << " \n";
 #endif
  }
 
@@ -312,7 +307,7 @@ template<class T, class Alloc>
 	  ptr = vect.ptr;
 	  vect.ptr = nullptr;
 #ifdef debag
-	  std::cout << " \n" << "Конструктор перемещения" <<  " \n";
+	  std::cout << " \n" << "РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРµСЂРµРјРµС‰РµРЅРёСЏ" <<  " \n";
 #endif
  }
 
@@ -338,8 +333,8 @@ my::vector<T, Alloc>::iterator<T> my::vector<T, Alloc>::begin()
 template<class T, class Alloc>
 my::vector<T, Alloc>::iterator<T> my::vector<T, Alloc>::end()
 {
-
-	return my::vector<T, Alloc>::iterator<T>(ptr+ _size);
+	
+	return my::vector<T, Alloc>::iterator<T>(ptr+ _size,_size+1);
 }
 
 template<class T, class Alloc>
@@ -353,7 +348,7 @@ template<class T, class Alloc>
 my::vector<T, Alloc>::iterator<T> my::vector<T, Alloc>::end() const
 {
 
-	return my::vector<T, Alloc>::iterator<T>(ptr + _size); 
+	return my::vector<T, Alloc>::iterator<T>(ptr + _size, _size + 1);
 }
 
 template<class T, class Alloc>
@@ -377,11 +372,11 @@ template<class T, class Alloc>
  template<class T, class Alloc>
  void my::vector<T, Alloc>::resize(size_t x)
  {
-	 if (x < _capacity && x != _capacity)  // ручная вниз (resize)
+	 if (x < _capacity && x != _capacity)  // СЂСѓС‡РЅР°СЏ РІРЅРёР· (resize)
 	 {
 		 _size = x;
 	 }
-	 else if (x > _capacity) //ручная вверх (resize)
+	 else if (x > _capacity) //СЂСѓС‡РЅР°СЏ РІРІРµСЂС… (resize)
 	 {
 		 T* new_ptr = allocator.allocate(x);
 
@@ -396,7 +391,7 @@ template<class T, class Alloc>
 		 _capacity = x;
 		 _size = x;
 	 }
-	 else if(x== _capacity)  // реалокация от добавления
+	 else if(x== _capacity)  // СЂРµР°Р»РѕРєР°С†РёСЏ РѕС‚ РґРѕР±Р°РІР»РµРЅРёСЏ
 	 {
 		 if (_capacity == 0)
 		 {
@@ -460,7 +455,7 @@ template<class T, class Alloc>
 	   if (value < _size)
 		   return ptr[value];
 	   else
-		   throw std::out_of_range("Выход за пределы массива");
+		   throw std::out_of_range("Р’С‹С…РѕРґ Р·Р° РїСЂРµРґРµР»С‹ РјР°СЃСЃРёРІР°");
   }
    
 
@@ -596,7 +591,7 @@ template<class T, class Alloc>
 		 void my::vector<T, Alloc>::erase(vector<T, Alloc>::iterator<T>& first, vector<T, Alloc>::iterator<T>& last)
 		{
 			 int iter=0;
-			 if(last>first) // добавь проверку на зону в масиве
+			 if(last>first) // РґРѕР±Р°РІСЊ РїСЂРѕРІРµСЂРєСѓ РЅР° Р·РѕРЅСѓ РІ РјР°СЃРёРІРµ
 			   for (; first != last; ++first)
 			   {
 			  	   *first = std::move(*end());
@@ -672,7 +667,7 @@ template<class T, class Alloc>
 		   }
 
 #ifdef debag
-		   std::cout << " \n" << "Присвоение копированием" << " \n";
+		   std::cout << " \n" << "РџСЂРёСЃРІРѕРµРЅРёРµ РєРѕРїРёСЂРѕРІР°РЅРёРµРј" << " \n";
 #endif
 	   return *this;
    }
@@ -688,7 +683,7 @@ template<class T, class Alloc>
 	   ptr = vect.ptr;
 	   vect.ptr = nullptr;
 #ifdef debag
-	   std::cout << " \n" << "Присвоение перемещением" << " \n";
+	   std::cout << " \n" << "РџСЂРёСЃРІРѕРµРЅРёРµ РїРµСЂРµРјРµС‰РµРЅРёРµРј" << " \n";
 #endif
 	   return *this;
    }
@@ -714,7 +709,7 @@ template<class T, class Alloc>
 
 
 
-//////////////////////////////////////////Итератор вектора////////////////////
+//////////////////////////////////////////РС‚РµСЂР°С‚РѕСЂ РІРµРєС‚РѕСЂР°////////////////////
 
 
 template<class T, class Alloc>
@@ -722,6 +717,8 @@ template<class U>
  my::vector<T, Alloc>::iterator<U>::iterator(U* ptr):ptr(ptr)
 {
 }
+
+
 
 template<class T, class Alloc>
 template<class U>
@@ -830,4 +827,16 @@ template<class U>
   inline int my::vector<T, Alloc>::iterator<U>::get_position()
   {
 	  return position;
+  }
+
+  template<class T, class Alloc>
+  template<class U>
+  my::vector<T, Alloc>::iterator<U>::iterator(U* ptr,int pos) :ptr(ptr),position(pos)
+  {
+	 
+  }
+
+
+  void w(){
+	  //РћС€РёР±РєР°(Р°РєС‚РёРІРЅРѕ)	E2923	РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ PCH : РєРѕРЅРµС† Р·Р°РіРѕР»РѕРІРєР° РЅРµ РІ РѕР±Р»Р°СЃС‚Рё РІРёРґРёРјРѕСЃС‚Рё С„Р°Р№Р»Р°.PCH - С„Р°Р№Р» IntelliSense РЅРµ Р±С‹Р» СЃРѕР·РґР°РЅ.
   }

@@ -73,8 +73,13 @@ int main()
 		}
 		std::cout << std::endl;
 
+		auto v = X.end() - 2;
 
-		X.emplace_back(2);
-
+		X.insert(v,2);
+		for (auto const& x : X)
+		{
+			std::cout << x << " ";
+		}
+		std::cout << std::endl;
 
 }
