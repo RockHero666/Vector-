@@ -15,7 +15,7 @@ namespace my
 	class Allocator  // менеджер памяти
 	{
 	public:
-		T* pointer = nullptr; // указатель на динамическую память который передается при аллоцировании
+		T* pointer; // указатель на динамическую память который передается при аллоцировании
 	public:
 		Allocator();
 		Allocator(const Allocator& copy_alloc); // почленное копирование
@@ -36,9 +36,9 @@ namespace my
 	{
 
 	private:
-		size_t _capacity = 0; // вместимость (реальное количество доступных ячеек)
-		size_t _size = 0;     // предпологаемый пользователем размер вектора
-		T* ptr = nullptr;    // указатель на аллоцированную память
+		size_t _capacity; // вместимость (реальное количество доступных ячеек)
+		size_t _size;     // предпологаемый пользователем размер вектора
+		T* ptr;    // указатель на аллоцированную память
 		Alloc allocator;     // экземпляр аллокатора для управления памятью 
 		
 
@@ -57,8 +57,8 @@ namespace my
 				using reference = void;
 
 			private:
-				U* ptr= nullptr;
-				int position = 0;
+				U* ptr;
+				int position;
 			public:
 				iterator(U* ptr);
 				bool operator == (const iterator<U>& ptr);
@@ -133,6 +133,8 @@ namespace my
 			size_t capacity();
 			bool empty();
 			void shrink_to_fit();
+			void swap(vector& vect);
+			void reserve(const size_t x);
 
 			T& operator [](size_t position)const;
 			vector& operator = (const vector<T, Alloc>& vect);
@@ -663,6 +665,34 @@ template<class T, class Alloc>
 		 ptr = new_ptr;
 	 }
 
+	 template<class T, class Alloc>
+	 void my::vector<T, Alloc>::swap(vector& vect)
+	 {
+		 vector<T, Alloc> temp;
+		 temp = std::move(*this);
+		 *this = std::move(vect);
+		 vect = std::move(temp);
+	 }
+
+	 template<class T, class Alloc>
+	 void my::vector<T, Alloc>::reserve(const size_t x)
+	 {
+		 if (x == _capacity||x < _capacity)
+			 return;
+
+		 T* new_ptr = allocator.allocate(x);
+		 _capacity = x;
+
+		 for (int i = 0; i < _size; i++)
+		 {
+			 new_ptr[i] = std::move(ptr[i]);
+		 }
+
+		 delete[] ptr;
+
+		 ptr = new_ptr;
+	 }
+
 
    template<class T, class Alloc>
    T& my::vector<T, Alloc>::operator[](size_t position) const
@@ -858,3 +888,4 @@ template<class U>
   void w(){
 	  //Ошибка(активно)	E2923	Предупреждение PCH : конец заголовка не в области видимости файла.PCH - файл IntelliSense не был создан.
   }
+

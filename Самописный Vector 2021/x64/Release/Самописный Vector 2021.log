@@ -1,0 +1,8 @@
+﻿  Source.cpp
+Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\Самописный Vector 2021\Source.cpp(50,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  Создание кода
+  6 of 39 functions (15.4%) were compiled, the rest were copied from previous compilation.
+    5 functions were new in current compilation
+    6 functions had inline decision re-evaluated but remain unchanged
+  Создание кода завершено
+  Самописный Vector 2021.vcxproj -> Q:\C++ project\My project\Полезные подключаемые файлы\Самописный Vector 2021\x64\Release\Самописный Vector 2021.exe

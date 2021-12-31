@@ -1,5 +1,5 @@
 ﻿#include<iostream>
-//#include<vector>
+#include<vector>
 #include"my_vector.h"
 
 
@@ -7,14 +7,14 @@ int main()
 {
 	srand(time(0));
 	setlocale(0, "");
+	my::vector <int> z{1};
 
-	my::vector <int> X{5,4,7,3,3};
+	std::cout << z.capacity()<<std::endl;
+	z.reserve(400000);
+	std::cout << z.capacity()<<" "<<z.size() << std::endl;
+	z.emplace_back(1, 1, 1, 1, 1, 25);
+	std::cout << z.capacity() << " " << z.size() << std::endl;
+
 	
-	std::cout << "Емкость = " << X.capacity() << " Количество элементов = " << X.size() << std::endl;
-	std::cout << "Применяем X.shrink_to_fit()\n";
-	X.shrink_to_fit();
-	std::cout << "Емкость = " << X.capacity() << " Количество элементов = " << X.size() << std::endl;
-	std::cout << "Применяем X.emplace_back()\n";
-	X.emplace_back(2, 3);
-	std::cout << "Емкость = " << X.capacity() << " Количество элементов = " << X.size() << std::endl;
+	
 }
