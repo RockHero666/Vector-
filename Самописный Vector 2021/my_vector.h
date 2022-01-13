@@ -4,22 +4,38 @@
 
 namespace my
 {
+
+
+	namespace func
+	{
+		template<class T, class U>
+		struct is_same
+		{
+			static constexpr bool value = false;
+		};
+
+		template<class T>
+		struct is_same<T, T>
+		{
+			static constexpr bool value = true;
+		};
+	}
+
 	//////////////////////////////////////////////ALLOCATOR////////////////////////////////
 	
 	template<class T>
-	class Allocator  // менеджер памяти
+	class Allocator 
 	{
 	public:
-		T* pointer=nullptr; // указатель на динамическую память который передается при аллоцировании
-	public:
-		Allocator(); // конструктор по умолчанию
-		Allocator(const Allocator& copy_alloc); // почленное копирование
-
-		T* allocate(const size_t size); // возвращает указатель на область памяти  равную size
-		void deallocate(); // освобождение памяти 
-		size_t max_size() const; // возвращает максимальное значение для алокации
-		bool operator ==(const Allocator<T>& alloc); // оператор равенства
-		bool operator !=(const Allocator<T>& alloc); // оператор неравенства
+	
+		T* _ptr=nullptr;									   // указатель на динамическую память который передается при аллоцировании
+		Allocator();										   // конструктор по умолчанию
+		Allocator(const Allocator& copy_alloc);				   // почленное копирование
+		T* allocate(const size_t size);						   // возвращает указатель на область памяти  равную size
+		void deallocate();									   // освобождение памяти 
+		size_t max_size() const;							   // возвращает максимальное значение для алокации
+		bool operator ==(const Allocator<T>& alloc);		   // оператор равенства
+		bool operator !=(const Allocator<T>& alloc);		   // оператор неравенства
 		Allocator& operator = (const Allocator<T>&) = default; // стандартный оператор присвоения
 		
 	};//////////////////////////////////////////////ALLOCATOR END////////////////////////////////
@@ -29,15 +45,12 @@ namespace my
 	template<class T, class Alloc = Allocator<T> > ///////////////////////////////////VECTOR///////////////////////
 	class vector
 	{
-
 	private:
 		size_t _capacity = 0; // вместимость (реальное количество доступных ячеек)
 		size_t _size = 0;     // предпологаемый пользователем размер вектора
 		T* ptr = nullptr;    // указатель на аллоцированную память
 		Alloc allocator;     // экземпляр аллокатора для управления памятью 
 		
-
-
 	public:
 		
 			template<class U=T>
@@ -123,13 +136,17 @@ namespace my
 			vector& operator = ( vector<T, Alloc>&& vect) noexcept ;   // оператор присваивания перемещением
 			vector& operator = (const std::initializer_list<T>& list); // оператор присваивания перемещением листа инициализации
 			 
-			// добавить операторы сравнений
+			bool operator >  (vector<T, Alloc>& vect); // оператор сравнения
+			bool operator <  (vector<T, Alloc>& vect); // оператор сравнения
+			bool operator == (vector<T, Alloc>& vect); // оператор сравнения
+			bool operator != (vector<T, Alloc>& vect); // оператор сравнения
+			bool operator >= (vector<T, Alloc>& vect); // оператор сравнения
+			bool operator <= (vector<T, Alloc>& vect); // оператор сравнения
 	};
 	
 }////////////////////////////////////////////////////VECTOR END/////////////////////////////////////////
 
 
-using namespace my;
 
 ///////////////////////////блок Аллокатора/////////////////////////////////////////
 
@@ -142,14 +159,14 @@ my::Allocator<T>::Allocator()
 template<class T>
 my::Allocator<T>::Allocator(const Allocator& copy_alloc)
 {
-	this->pointer = copy_alloc.pointer;
+	this->_ptr = copy_alloc._ptr;
 }
 
 template<class T>
 T* my::Allocator<T>::allocate(const size_t size)
 {
-	pointer = new T[size];
-	return pointer;
+	_ptr = new T[size];
+	return _ptr;
 }
 
 
@@ -157,12 +174,12 @@ T* my::Allocator<T>::allocate(const size_t size)
 template<class T>
 void my::Allocator<T>::deallocate()
 {
-	if (pointer == nullptr)
+	if (_ptr == nullptr)
 		return;
 	else
 	{
-		delete[] pointer;
-		pointer = nullptr;
+		delete[] _ptr;
+		_ptr = nullptr;
 	}
 }
 
@@ -177,24 +194,20 @@ template<class T>
 template<class T>
  bool my::Allocator<T>::operator==(const Allocator<T>& alloc)
 {
-	return this->pointer == alloc.pointer;
+	return this->_ptr == alloc._ptr;
 }
 
 template<class T>
  bool my::Allocator<T>::operator!=(const Allocator<T>& alloc)
 {
-	 return this->pointer != alloc.pointer;
+	 return this->_ptr != alloc._ptr;
 }
-
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
-///////////////////////////блок Вектора/////////////////////////////////////////
+///////////////////////////блок Вектора/////////////////////////////////////////////////////
 
 template<class T, class Alloc>
 my::vector<T, Alloc>::vector()
@@ -315,20 +328,9 @@ my::vector<T, Alloc>::iterator<T> my::vector<T, Alloc>::end() const
 template<class T, class Alloc>
  void my::vector<T, Alloc>::push_back(const T& value)
 {
-
-	/*if (_size >= _capacity)
-	{
-		resize(_capacity);
-	}
-
-	ptr[_size] = value;
-	
-	_size++;*/
 	 T val = value;
 	 emplace_back(std::move(val));
-
 }
-
 
  template<class T, class Alloc>
  void my::vector<T, Alloc>::resize(const size_t x) 
@@ -361,7 +363,6 @@ template<class T, class Alloc>
 		 }
 		 else
 		 {
-
 			 T* new_ptr = allocator.allocate(x * 2);
 
 			 for (int i = 0; i < x; i++)
@@ -553,7 +554,7 @@ template<class T, class Alloc>
 		{
 		
 			 int iter=0;
-			 if(last> first && last.get_position() <= this->size()) // добавь проверку на зону в масиве
+			 if(last> first && last.get_position() <= this->size()) 
 			   for (; first != last; ++first)
 			   {
 			  	   *first = std::move(*end());
@@ -664,7 +665,6 @@ template<class T, class Alloc>
    template<class T, class Alloc>
    my::vector<T,Alloc>& my::vector<T, Alloc>::operator =(const vector<T, Alloc>& vect) 
    {
-
 	   allocator.deallocate();
 	   _size = vect._size;
 	   _capacity = vect._capacity;
@@ -688,7 +688,7 @@ template<class T, class Alloc>
 	   _size = vect._size;
 	   _capacity = vect._capacity;
 	   allocator = vect.allocator;
-	   vect.allocator.pointer = nullptr;
+	   vect.allocator._ptr = nullptr;
 	   ptr = vect.ptr;
 	   vect.ptr = nullptr;
 #ifdef debag
@@ -706,7 +706,79 @@ template<class T, class Alloc>
 	   }
 	   return *this;
    }
- ////////////////////////////////////////////////////////////////////////////
+   template<class T, class Alloc>
+   bool my::vector<T, Alloc>::operator>(vector<T, Alloc>& vect)
+   {
+		   if constexpr (my::func::is_same<decltype(*this),decltype(vect)>::value)
+		   {
+
+
+			   for (int i=0; i < _size; i++)
+			   {
+				   if (this->ptr[i] == vect.ptr[i])
+					   continue;
+
+				   if (this->ptr[i] > vect.ptr[i])
+					   return 1;
+			   }
+			   return 0;
+		   }
+		   else
+		   {
+			   return 0;
+		   }
+   }
+
+   template<class T, class Alloc>
+   inline bool my::vector<T, Alloc>::operator<(vector<T, Alloc>& vect)
+   {
+	   return !(*this > vect);
+   }
+
+   template<class T, class Alloc>
+   inline bool my::vector<T, Alloc>::operator==(vector<T, Alloc>& vect)
+   {
+	   if (this->_size != vect._size)
+		   return 0;
+
+	   if constexpr (my::func::is_same<decltype(*this), decltype(vect)>::value)
+	   {
+		   for (int i = 0; i < _size; i++)
+		   {
+			   if (this->ptr[i] == vect.ptr[i])
+				   continue;
+
+				   return 0;
+		   }
+		   return 1;
+	   }
+	   else
+	   {
+		   return 0;
+	   }
+
+   }
+
+   template<class T, class Alloc>
+   inline bool my::vector<T, Alloc>::operator!=(vector<T, Alloc>& vect)
+   {
+	   return !(*this == vect);
+   }
+
+   template<class T, class Alloc>
+   inline bool my::vector<T, Alloc>::operator>=(vector<T, Alloc>& vect)
+   {
+	   return (*this > vect || *this == vect);
+   }
+
+   template<class T, class Alloc>
+   inline bool my::vector<T, Alloc>::operator<=(vector<T, Alloc>& vect)
+   {
+	   return ( *this < vect || *this == vect); 
+   }
+
+
+ /////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -838,7 +910,7 @@ template<class U>
   }
 
 
-  void w(){
+  void w() = delete;
 	  //Ошибка(активно)	E2923	Предупреждение PCH : конец заголовка не в области видимости файла.PCH - файл IntelliSense не был создан.
-  }
+  
 
