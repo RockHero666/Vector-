@@ -87,7 +87,7 @@ namespace my
 			};////////////////////////////////////////////////////////////////////ITERATOR END/////////////
 
 			vector();									  // конструктор без параметров выделяет память на 8 ячеек
-			vector(size_t size, const T& val = T());	  // конструктор выделяющий size ячеек а capacity size*2 если size>8 или = 8  при size<8
+			vector(size_t size);						  // конструктор выделяющий size ячеек 
 			vector(const vector& vect);					  // конструктор копирования с полным копированием данных масивва и аллокацией нового
 			~vector();									  // деструктор
 			vector(vector&& vect)noexcept;				  // конструктор перемещения
@@ -218,10 +218,10 @@ my::vector<T, Alloc>::vector()
 }
 
 template<class T, class Alloc>
-my::vector<T, Alloc>::vector(size_t size, const T& val) :_size(size)
+my::vector<T, Alloc>::vector(size_t size) :_size(size)
 {
 	
-	
+	/*
 	auto lamb = [&]() ->int
 	{
 		int x=8;
@@ -235,14 +235,14 @@ my::vector<T, Alloc>::vector(size_t size, const T& val) :_size(size)
 		return x;
 	};
 
-	_capacity = lamb();
+	_capacity = lamb();*/
 
-	ptr = allocator.allocate(_capacity);
+	ptr = allocator.allocate(size);
 
-	for (int i = 0; i < size; i++)
-	{
-		ptr[i] = std::move(val);
-	}
+	//for (int i = 0; i < size; i++)
+	//{
+	//	ptr[i] = std::move(val);
+	//}
 #ifdef debag
 	std::cout << " \n" << "Конструктор с аргументами" << " \n";
 #endif
