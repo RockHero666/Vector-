@@ -30,13 +30,13 @@ namespace my
 	{
 	public:
 
-        char* boofer;
+        
 		T* _ptr=nullptr;									   // указатель на динамическую память который передается при аллоцировании
 		Allocator();										   // конструктор по умолчанию
 		Allocator(const Allocator& copy_alloc);				   // почленное копирование
 		T* allocate(const size_t size);						   // возвращает указатель на область памяти  равную size
 		void deallocate();									   // освобождение памяти 
-        T* realloc(const size_t size);
+        T* realloc(const size_t size);						   // Перевыделяет сырую память
 		size_t max_size() const;							   // возвращает максимальное значение для алокации
 		bool operator ==(const Allocator<T>& alloc);		   // оператор равенства
 		bool operator !=(const Allocator<T>& alloc);		   // оператор неравенства
@@ -100,7 +100,7 @@ namespace my
 			iterator<T> begin() const;					  // итератор вернет ptr
 			iterator<T> end() const;					  // итератор вернет ptr + count
 			void	    push_back(const T& value);		  // обертка для emplace_back
-            void        push_back(T&& value);
+            void        push_back(T&& value);			  // обертка для emplace_back 
 			void	    resize(const size_t x);			  // с возможностью ручной и автоматической реалокации через увеличение вектора методами вектора
 			void	    clear();						  // очистка памяти и сброс членов контейнера
 			size_t	    size() const;					  // вернет количество элементов в контейнере
@@ -115,16 +115,16 @@ namespace my
 #endif 
 #ifdef C17
 			template<class...Args>
-		    void emplace_back(Args && ... args); // перемещение в конец контейнера через fold expression
+		    void emplace_back(Args && ... args);													// перемещение в конец контейнера через fold expression
 #endif 
 
-			void emplace(vector<T, Alloc>::iterator<T>& _where, T&& value); // перемещение через итератор контейнера
+			void emplace(vector<T, Alloc>::iterator<T>& _where, T&& value);							// перемещение через итератор контейнера
 			template<class...Args>
-			void emplace(vector<T, Alloc>::iterator<T> &_where,Args && ... args); // перемещение через итератор контейнера с fold expression
-			void insert(vector<T, Alloc>::iterator<T>& _where, T&& value); // обертка для emplace()
-			void pop_back(); // удаляет последний элемент в контейнере
-			void erase(vector<T, Alloc>::iterator<T>& first, vector<T, Alloc>::iterator<T>& last); // удаляет элементы с first по last 
-			void erase(vector<T, Alloc>::iterator<T>& first); // удаляет элементы с first по конец контейнера
+			void emplace(vector<T, Alloc>::iterator<T> &_where,Args && ... args);					// перемещение через итератор контейнера с fold expression
+			void insert(vector<T, Alloc>::iterator<T>& _where, T&& value);							// обертка для emplace()
+			void pop_back();																		// удаляет последний элемент в контейнере
+			void erase(vector<T, Alloc>::iterator<T>& first, vector<T, Alloc>::iterator<T>& last);  // удаляет элементы с first по last 
+			void erase(vector<T, Alloc>::iterator<T>& first);										// удаляет элементы с first по конец контейнера
 
 
 			T      front()    const;		 // вернет первый элемент контейнера
