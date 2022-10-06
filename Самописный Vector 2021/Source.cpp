@@ -1,27 +1,63 @@
 ﻿#include<iostream>
 #include"my_vector.h"
 #include<vector>
+#include<time.h>
 
+struct Y
+{   static int y;
+    int x=0;
+
+    Y()
+    {
+        x=y;
+        y++;
+    }
+};
+int Y::y=1;
 
 
 class Z
 {
 public:
 
-	static int x;
+     static int x;
 
-	Z() 
+     Z()
+     {
+       std::cout << "defult constr\n";
+       x++;
+     }
+
+    Z(int u)
 	{
 		std::cout << "constr\n";
-		x++;
+        x=u;
 	}
-	Z(const Z& z)  { std::cout << "copy\n"; }
-	Z& operator =(const Z& z) { std::cout << "copy=\n"; return *this; }
+    Z(const Z& z)
+    {
+        this->x = z.x;
+        std::cout << "copy\n";
+    }
+    Z& operator =(const Z& z)
+    {
+        this->x = z.x;
+        std::cout << "copy=\n";
+        return *this;
+    }
 	Z( Z&& z)
-	{ std::cout << "move\n"; }
+    {
+        this->x = z.x;
+        
+        std::cout << "move\n";
+    }
 
 	Z& operator =( Z&& z)
-	{ std::cout << "move=\n"; return *this;}
+    {
+        this->x = z.x;
+       
+        std::cout << "move=\n";
+        return *this;
+    }
 
 
 	int get()
@@ -40,23 +76,47 @@ int Z::x = 0;
 int main()
 {
 	
+
 	srand(time(0));
 	setlocale(0, "");
 
-	std::vector<Z> z(5);
-	z.push_back(Z());
-	z.push_back(Z());
-	std::cout << Z::x<<"\n";
-	std::cout << z[0].get() << "\n";
+    my::vector<Z> zz(5);
+    zz.push_back(Z());
+    zz.push_back(Z());
+  //  zz.push_back(Z());
+    zz.resize(25);
+    zz.push_back(Z());
+
+    for (int var = 0; var < 6; ++var) {
+        std::cout << zz[var].x << "\n";
+    }
+
+    //std::cout << zz[0].get() << "\n";
+    std::cout<<"-----\n";
 
 
-	my::vector<Z> zz(5);
-	z.push_back(Z());
-	z.push_back(Z());
-	std::cout << Z::x << "\n";
-	std::cout << zz[0].get() << "\n";
+
+
+   std::vector<Z> z(5);
+    z.push_back(Z());
+    z.push_back(Z());
+  //  z.push_back(Z());
+    z.resize(25);
+    z.push_back(Z());
+   for (int var = 0; var < 6; ++var) {
+       std::cout << z[var].x << "\n";
+   }
+
+  //  std::cout<<z.capacity();
+
+
+
+
+
+
 	
 
 	
 
 }
+

@@ -2,6 +2,8 @@
 //#define debag  // раскоментить для дебага
 #define C17 // поменять на 14 для variadic templates
 
+#include<iostream>
+
 namespace my
 {
 
@@ -27,12 +29,14 @@ namespace my
 	class Allocator 
 	{
 	public:
-	
+
+        char* boofer;
 		T* _ptr=nullptr;									   // указатель на динамическую память который передается при аллоцировании
 		Allocator();										   // конструктор по умолчанию
 		Allocator(const Allocator& copy_alloc);				   // почленное копирование
 		T* allocate(const size_t size);						   // возвращает указатель на область памяти  равную size
 		void deallocate();									   // освобождение памяти 
+        T* realloc(const size_t size);
 		size_t max_size() const;							   // возвращает максимальное значение для алокации
 		bool operator ==(const Allocator<T>& alloc);		   // оператор равенства
 		bool operator !=(const Allocator<T>& alloc);		   // оператор неравенства
@@ -96,6 +100,7 @@ namespace my
 			iterator<T> begin() const;					  // итератор вернет ptr
 			iterator<T> end() const;					  // итератор вернет ptr + count
 			void	    push_back(const T& value);		  // обертка для emplace_back
+            void        push_back(T&& value);
 			void	    resize(const size_t x);			  // с возможностью ручной и автоматической реалокации через увеличение вектора методами вектора
 			void	    clear();						  // очистка памяти и сброс членов контейнера
 			size_t	    size() const;					  // вернет количество элементов в контейнере
@@ -159,16 +164,50 @@ my::Allocator<T>::Allocator()
 template<class T>
 my::Allocator<T>::Allocator(const Allocator& copy_alloc)
 {
+    if(this->_ptr!=nullptr)
+        deallocate();
 	this->_ptr = copy_alloc._ptr;
 }
 
 template<class T>
 T* my::Allocator<T>::allocate(const size_t size)
 {
-	_ptr = new T[size];
+    if(_ptr==nullptr)
+    {
+       // _ptr = new T[size];
+
+        _ptr = static_cast<T*>(operator new(sizeof(T)*size));
+        _ptr = new(_ptr) T[size];
+
+       // boofer = new char[sizeof(T)*size*2];
+       // _ptr = boofer;//new(boofer) char();
+
+       // for (int i = 1; i < size; ++i) {
+        //    _ptr[i] = T();
+       // }
+    }
+    else 
+    {
+       return realloc(size);
+    }
+
+
+	
 	return _ptr;
 }
 
+template<class T>
+T* my::Allocator<T>::realloc(const size_t size)
+{
+     T* temp_boofer = static_cast<T*>(operator new(sizeof(T)*size));
+    
+     //for (int x = 0; x < this-> size; ++x) {
+     //    temp_boofer[x] = std::move(_ptr[x]);
+   //  }
+   //  operator delete(_ptr);
+     _ptr = temp_boofer;
+     return _ptr;
+}
 
 
 template<class T>
@@ -178,7 +217,7 @@ void my::Allocator<T>::deallocate()
 		return;
 	else
 	{
-		delete[] _ptr;
+        operator delete(_ptr);
 		_ptr = nullptr;
 	}
 }
@@ -218,7 +257,7 @@ my::vector<T, Alloc>::vector()
 }
 
 template<class T, class Alloc>
-my::vector<T, Alloc>::vector(size_t size) :_size(size)
+my::vector<T, Alloc>::vector(size_t size) :_size(size) , _capacity(size)
 {
 	
 	/*
@@ -237,12 +276,12 @@ my::vector<T, Alloc>::vector(size_t size) :_size(size)
 
 	_capacity = lamb();*/
 
-	ptr = allocator.allocate(size);
+    ptr = allocator.allocate(size);
 
-	//for (int i = 0; i < size; i++)
-	//{
-	//	ptr[i] = std::move(val);
-	//}
+    for (int i = 0; i < size; i++)
+    {
+       // ptr[i] = std::move(T());
+    }
 #ifdef debag
 	std::cout << " \n" << "Конструктор с аргументами" << " \n";
 #endif
@@ -329,8 +368,16 @@ template<class T, class Alloc>
  void my::vector<T, Alloc>::push_back(const T& value)
 {
 	 T val = value;
-	 emplace_back(std::move(val));
+     emplace_back(std::move(val));
 }
+
+template<class T, class Alloc>
+void my::vector<T, Alloc>::push_back( T&& value)
+{
+
+     emplace_back(std::move(value));
+}
+
 
  template<class T, class Alloc>
  void my::vector<T, Alloc>::resize(const size_t x) 
@@ -345,14 +392,14 @@ template<class T, class Alloc>
 
 		 for (int i = 0; i < _size; i++)
 		 {
-			 new_ptr[i] = ptr[i];
+			 new_ptr[i] = std::move(ptr[i]);
 		 }
 
-		 delete[] ptr;
+		 operator delete (ptr);
 		 ptr = new_ptr;
 
 		 _capacity = x;
-		 _size = x;
+		 //_size = x;
 	 }
 	 else if(x== _capacity)  // реалокация от добавления
 	 {
@@ -371,7 +418,7 @@ template<class T, class Alloc>
 			 }
 
 			 if (ptr != nullptr)
-				 delete[] ptr;
+				 operator delete (ptr);
 
 			 ptr = new_ptr;
 
@@ -428,7 +475,8 @@ template<class T, class Alloc>
 		{
 			resize(_capacity);
 		}
-		ptr[_size] = std::move(value);
+		//ptr[_size] = std::move(value);
+		new ((ptr+_size)) T(std::forward<T>(value));
 
 		_size++;
    }
@@ -849,7 +897,7 @@ template<class U>
  {
 	 auto temp = *this;
 	 ptr++;
-	 position++;
+     position++;
 	 return temp;
  }
 
