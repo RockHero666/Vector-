@@ -670,7 +670,8 @@ void my::vector<T, Alloc>::push_back( T&& value)
 			 new_ptr[i] = std::move(ptr[i]);
 		 }
 
-		 delete[] ptr;
+
+		 operator delete (ptr);
 
 		 ptr = new_ptr;
 	 }

@@ -86,6 +86,7 @@ int main()
   //  zz.push_back(Z());
     zz.resize(25);
     zz.push_back(Z());
+    zz.shrink_to_fit();
 
     for (int var = 0; var < 6; ++var) {
         std::cout << zz[var].x << "\n";
@@ -103,6 +104,7 @@ int main()
   //  z.push_back(Z());
     z.resize(25);
     z.push_back(Z());
+    z.shrink_to_fit();
    for (int var = 0; var < 6; ++var) {
        std::cout << z[var].x << "\n";
    }
