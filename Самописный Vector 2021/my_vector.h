@@ -52,12 +52,12 @@ namespace my
 	private:
 		size_t _capacity = 0; // вместимость (реальное количество доступных ячеек)
 		size_t _size = 0;     // предпологаемый пользователем размер вектора
-		T* ptr = nullptr;    // указатель на аллоцированную память
-		Alloc allocator;     // экземпляр аллокатора для управления памятью 
+		T* ptr = nullptr;     // указатель на аллоцированную память
+		Alloc allocator;      // экземпляр аллокатора для управления памятью 
 		
 	public:
 		
-			template<class U=T>
+			
 			class iterator //////////////////////////////////////////////////////////ITERATOR/////////////
 			{
 				friend class vector; // полный доступ для контейнера в класс итератора
@@ -69,24 +69,26 @@ namespace my
 				using reference = void;										/////////////
 
 			private:
-				U* ptr;			 // указатель на ячейку контейнера
+				T* ptr;			 // указатель на ячейку контейнера
 				size_t position; // переменная для понимания где сейчас итератор относительно _size контейнера
 			public:
-				iterator(U* ptr);								 // конструктор принимающий указатель на ячейку контейнера
-				bool operator == (const iterator<U>& ptr) const; // оператор равенства
-				bool operator != (const iterator<U>& ptr) const; // оператор неравенства
-				bool operator > (const iterator<U>& ptr) const;  // оператор больше
-				T& operator * () const;							 // оператор разиминования 
-				iterator<U>& operator++();						 // префексный инкримент итератора
-				iterator<U>& operator--();						 // префексный дикримент итератора
-				iterator<U> operator++(int);					 // постфиксный инкримент итератора
-				iterator<U> operator--(int);					 // постфиксный дикримент итератора
-				void operator=(U& value);						 // оператор присваивания копированием
-				iterator<U> operator - (const int x);			 // оператор минус
-				iterator<U> operator + (const int x);			 // оператор плюс
-				int get_position() const;						 // возвращает позицию оносительно size контейнера
+				iterator();
+				iterator(T* ptr);							  // конструктор принимающий указатель на ячейку контейнера
+				bool operator == (const iterator& ptr) const; // оператор равенства
+				bool operator != (const iterator& ptr) const; // оператор неравенства
+				bool operator > (const iterator& ptr) const;  // оператор больше
+				bool operator < (const iterator& ptr) const;  // оператор меньше
+				T& operator * () const;						  // оператор разиминования 
+				iterator& operator++();						 // префексный инкримент итератора
+				iterator& operator--();						 // префексный дикримент итератора
+				iterator operator++(int);					 // постфиксный инкримент итератора
+				iterator operator--(int);					 // постфиксный дикримент итератора
+				void operator=(const iterator& ptr);		 // оператор присваивания копированием
+				iterator operator - (const int x);			 // оператор минус
+				iterator operator + (const int x);			 // оператор плюс
+				int get_position() const;					 // возвращает позицию оносительно size контейнера
 			private:
-				iterator(U* ptr,int pos);						 // конструктор для коректной работы end() контейнера
+				iterator(T* ptr,int pos);					 // конструктор для коректной работы end() контейнера
 
 			};////////////////////////////////////////////////////////////////////ITERATOR END/////////////
 
@@ -97,8 +99,8 @@ namespace my
 			vector(vector&& vect)noexcept;				  // конструктор перемещения
 			vector(const std::initializer_list<T>& list); // конструктор с параметром листа инициализации
 
-			iterator<T> begin() const;					  // итератор вернет ptr
-			iterator<T> end() const;					  // итератор вернет ptr + count
+			iterator begin() const;					      // итератор вернет ptr
+			iterator end() const;					      // итератор вернет ptr + count
 			void	    push_back(const T& value);		  // обертка для emplace_back
             void        push_back(T&& value);			  // обертка для emplace_back 
 			void	    resize(const size_t x);			  // с возможностью ручной и автоматической реалокации через увеличение вектора методами вектора
@@ -115,16 +117,16 @@ namespace my
 #endif 
 #ifdef C17
 			template<class...Args>
-		    void emplace_back(Args && ... args);													// перемещение в конец контейнера через fold expression
+		    void emplace_back(Args && ... args);											  // перемещение в конец контейнера через fold expression
 #endif 
 
-			void emplace(vector<T, Alloc>::iterator<T>& _where, T&& value);							// перемещение через итератор контейнера
+			void emplace(vector<T, Alloc>::iterator& _where, T&& value);					  // перемещение через итератор контейнера
 			template<class...Args>
-			void emplace(vector<T, Alloc>::iterator<T> &_where,Args && ... args);					// перемещение через итератор контейнера с fold expression
-			void insert(vector<T, Alloc>::iterator<T>& _where, T&& value);							// обертка для emplace()
-			void pop_back();																		// удаляет последний элемент в контейнере
-			void erase(vector<T, Alloc>::iterator<T>& first, vector<T, Alloc>::iterator<T>& last);  // удаляет элементы с first по last 
-			void erase(vector<T, Alloc>::iterator<T>& first);										// удаляет элементы с first по конец контейнера
+			void emplace(vector<T, Alloc>::iterator &_where,Args && ... args);				  // перемещение через итератор контейнера с fold expression
+			void insert(vector<T, Alloc>::iterator& _where, T&& value);						  // обертка для emplace()
+			void pop_back();																  // удаляет последний элемент в контейнере
+			void erase(vector<T, Alloc>::iterator& first, vector<T, Alloc>::iterator& last);  // удаляет элементы с first по last 
+			void erase(vector<T, Alloc>::iterator& first);									  // удаляет элементы с first по конец контейнера
 
 
 			T      front()    const;		 // вернет первый элемент контейнера
@@ -351,17 +353,17 @@ template<class T, class Alloc>
 
 
 template<class T, class Alloc>
-my::vector<T, Alloc>::iterator<T> my::vector<T, Alloc>::begin() const
+typename my::vector<T, Alloc>::iterator my::vector<T, Alloc>::begin() const
 {
 
-	return my::vector<T, Alloc>::iterator<T>(ptr);
+	return my::vector<T, Alloc>::iterator(ptr);
 }
 
 template<class T, class Alloc>
-my::vector<T, Alloc>::iterator<T> my::vector<T, Alloc>::end() const
+typename my::vector<T, Alloc>::iterator my::vector<T, Alloc>::end() const
 {
 
-	return my::vector<T, Alloc>::iterator<T>(ptr + _size, _size + 1);
+	return my::vector<T, Alloc>::iterator(ptr + _size, _size + 1);
 }
 
 template<class T, class Alloc>
@@ -464,7 +466,7 @@ void my::vector<T, Alloc>::push_back( T&& value)
 	   if (value < _size)
 		   return ptr[value];
 	   else
-		   throw std::out_of_range("Выход за пределы массива");
+		   throw std::out_of_range("out of range");
   }
    
 
@@ -514,10 +516,10 @@ void my::vector<T, Alloc>::push_back( T&& value)
 
 
 	  template<class T, class Alloc>
-	   void my::vector<T, Alloc>::emplace(vector<T, Alloc>::iterator<T> &_where, T&& value)
+	   void my::vector<T, Alloc>::emplace(vector<T, Alloc>::iterator &_where, T&& value)
 	  {
 		   int beg_end = 0;
-		   vector<T, Alloc>::iterator<T> new_where = begin();
+		   vector<T, Alloc>::iterator new_where = begin();
 		  
 		   if (_where == begin())
 		   {
@@ -569,7 +571,7 @@ void my::vector<T, Alloc>::push_back( T&& value)
 
 	   template<class T, class Alloc>
 	   template<class ...Args>
-	   void  my::vector<T, Alloc>::emplace(vector<T, Alloc>::iterator<T> &_where, Args && ...args)
+	   void  my::vector<T, Alloc>::emplace(vector<T, Alloc>::iterator &_where, Args && ...args)
 	   {
 		   if (_where != nullptr &&   end() > _where)
 		   {
@@ -581,7 +583,7 @@ void my::vector<T, Alloc>::push_back( T&& value)
 	   }
 
 	   template<class T, class Alloc>
-	    void my::vector<T, Alloc>::insert(vector<T, Alloc>::iterator<T>& _where, T&& value)
+	    void my::vector<T, Alloc>::insert(vector<T, Alloc>::iterator& _where, T&& value)
 	   {
 			if (_where != nullptr && end() > _where)
 			   emplace(_where, std::forward<T&&>(value));
@@ -598,7 +600,7 @@ void my::vector<T, Alloc>::push_back( T&& value)
 		}
 
 		template<class T, class Alloc>
-		 void my::vector<T, Alloc>::erase(vector<T, Alloc>::iterator<T>& first, vector<T, Alloc>::iterator<T>& last)
+		 void my::vector<T, Alloc>::erase(vector<T, Alloc>::iterator& first, vector<T, Alloc>::iterator& last)
 		{
 		
 			 int iter=0;
@@ -612,7 +614,7 @@ void my::vector<T, Alloc>::push_back( T&& value)
 		}
 
 		template<class T, class Alloc>
-		 void my::vector<T, Alloc>::erase(vector<T, Alloc>::iterator<T>& first)
+		 void my::vector<T, Alloc>::erase(vector<T, Alloc>::iterator& first)
 		{
 			
 			 int iter = 0;
@@ -833,49 +835,53 @@ void my::vector<T, Alloc>::push_back( T&& value)
 
 //////////////////////////////////////////Итератор вектора////////////////////
 
+template<class T, class Alloc>
+ my::vector<T, Alloc>::iterator::iterator():ptr(nullptr),position(0)
+{
+}
 
 template<class T, class Alloc>
-template<class U>
- my::vector<T, Alloc>::iterator<U>::iterator(U* ptr):ptr(ptr)
+ my::vector<T, Alloc>::iterator::iterator(T* ptr):ptr(ptr),position(0)
 {
 }
 
 
 
 template<class T, class Alloc>
-template<class U>
- bool my::vector<T, Alloc>::iterator<U>::operator==(const iterator<U>& ptr) const
+ bool my::vector<T, Alloc>::iterator::operator==(const iterator& ptr) const
 {
 	return this->ptr == ptr.ptr;
 }
  
 
 template<class T, class Alloc>
-template<class U>
- bool my::vector<T, Alloc>::iterator<U>::operator!=(const iterator<U>& ptr) const
+ bool my::vector<T, Alloc>::iterator::operator!=(const iterator& ptr) const
 {
 	return this->ptr != ptr.ptr;
 }
 
 
  template<class T, class Alloc>
- template<class U>
-  bool my::vector<T, Alloc>::iterator<U>::operator>(const iterator<U>& ptr) const
+  bool my::vector<T, Alloc>::iterator::operator>(const iterator& ptr) const
  {
 	 return this->ptr > ptr.ptr;
  }
 
+  template<class T, class Alloc>
+  bool my::vector<T, Alloc>::iterator::operator<(const iterator& ptr) const
+  {
+	  return this->ptr < ptr.ptr;
+  }
+
 template<class T, class Alloc>
-template<class U>
- T& my::vector<T, Alloc>::iterator<U>::operator*() const
+ T& my::vector<T, Alloc>::iterator::operator*() const
 {
 	 if(ptr!=nullptr)
 	return *ptr;
 }
 
  template<class T, class Alloc>
- template<class U>
- my::vector<T, Alloc>::iterator<U>& my::vector<T, Alloc>::iterator<U>::operator++()
+ typename my::vector<T, Alloc>::iterator& my::vector<T, Alloc>::iterator::operator++()
  {
 	 ptr++;
 	 position++;
@@ -883,8 +889,7 @@ template<class U>
  }
 
  template<class T, class Alloc>
- template<class U>
- my::vector<T, Alloc>::iterator<U>& my::vector<T, Alloc>::iterator<U>::operator--()
+ typename my::vector<T, Alloc>::iterator& my::vector<T, Alloc>::iterator::operator--()
  {
 	 ptr--;
 	 position--;
@@ -893,8 +898,7 @@ template<class U>
 
 
  template<class T, class Alloc>
- template<class U>
- my::vector<T, Alloc>::iterator<U> my::vector<T, Alloc>::iterator<U>::operator++ (int)
+ typename my::vector<T, Alloc>::iterator my::vector<T, Alloc>::iterator::operator++ (int)
  {
 	 auto temp = *this;
 	 ptr++;
@@ -904,8 +908,7 @@ template<class U>
 
 
  template<class T, class Alloc>
- template<class U>
- my::vector<T, Alloc>::iterator<U> my::vector<T, Alloc>::iterator<U>::operator--(int)
+ typename my::vector<T, Alloc>::iterator my::vector<T, Alloc>::iterator::operator--(int)
  {
 	 auto temp = *this;
 	 ptr--;
@@ -915,16 +918,14 @@ template<class U>
 
  
  template<class T, class Alloc>
- template<class U>
-  void my::vector<T, Alloc>::iterator<U>::operator=(U& value)
+  void my::vector<T, Alloc>::iterator::operator=(const iterator& ptr)
  {
-	  *ptr = value;
+	  this->ptr = ptr;
  }
 
 
   template<class T, class Alloc>
-  template<class U>
-  my::vector<T, Alloc>::iterator<U> my::vector<T, Alloc>::iterator<U>::operator-(const int x) 
+  typename my::vector<T, Alloc>::iterator my::vector<T, Alloc>::iterator::operator-(const int x)
   {
 	 
 	  auto temp = this;
@@ -934,8 +935,7 @@ template<class U>
   }
 
   template<class T, class Alloc>
-  template<class U>
-  my::vector<T, Alloc>::iterator<U> my::vector<T, Alloc>::iterator<U>::operator+(const int x) 
+  typename my::vector<T, Alloc>::iterator my::vector<T, Alloc>::iterator::operator+(const int x)
   {
 	  auto temp = this;
 	  this->ptr += x;
@@ -945,15 +945,13 @@ template<class U>
 
   
   template<class T, class Alloc>
-  template<class U>
-  inline int my::vector<T, Alloc>::iterator<U>::get_position() const
+   int my::vector<T, Alloc>::iterator::get_position() const
   {
 	  return position;
   }
 
   template<class T, class Alloc>
-  template<class U>
-  my::vector<T, Alloc>::iterator<U>::iterator(U* ptr,int pos) :ptr(ptr),position(pos) 
+  my::vector<T, Alloc>::iterator::iterator(T* ptr,int pos) :ptr(ptr),position(pos) 
   {
 	 
   }

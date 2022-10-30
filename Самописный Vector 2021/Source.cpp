@@ -107,11 +107,26 @@ int main()
     z.shrink_to_fit();
    for (int var = 0; var < 6; ++var) {
        std::cout << z[var].x << "\n";
+
+
+      
+
+
    }
 
   //  std::cout<<z.capacity();
 
+   std::cout << "-----\n";
 
+
+
+   //my::vector<my::vector<Z>> zz(5);
+  // zz[0][0] = Z();
+
+
+
+   my::vector<my::vector<Z>> zzz(5);
+   zzz[0][0] = Z();
 
 
 
