@@ -83,7 +83,7 @@ namespace my
 				iterator& operator--();						 // префексный дикримент итератора
 				iterator operator++(int);					 // постфиксный инкримент итератора
 				iterator operator--(int);					 // постфиксный дикримент итератора
-				void operator=(const iterator& ptr);		 // оператор присваивания копированием
+				iterator operator=(const iterator ptr);		 // оператор присваивания копированием
 				iterator operator - (const int x);			 // оператор минус
 				iterator operator + (const int x);			 // оператор плюс
 				int get_position() const;					 // возвращает позицию оносительно size контейнера
@@ -918,9 +918,10 @@ template<class T, class Alloc>
 
  
  template<class T, class Alloc>
-  void my::vector<T, Alloc>::iterator::operator=(const iterator& ptr)
+ typename my::vector<T, Alloc>::iterator my::vector<T, Alloc>::iterator::operator=(const iterator ptr)
  {
-	  this->ptr = ptr;
+	  this->ptr = ptr.ptr;
+	  return this->ptr;
  }
 
 
